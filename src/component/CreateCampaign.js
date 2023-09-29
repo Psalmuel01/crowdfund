@@ -4,6 +4,7 @@ import useProposeCampaign from "../hooks/useProposeCampaign";
 import { useConnection } from "../context/connection";
 import { supportedChains } from "../constants";
 import { parseEther } from "ethers";
+import { toast } from "react-toastify";
 
 const CreateCampaign = () => {
   let [isOpen, setIsOpen] = useState(false);
@@ -24,8 +25,9 @@ const CreateCampaign = () => {
   }
 
   const handleProposeCampaign = async () => {
-    if (!title || !goal || !duration) return alert("Please provide all valeus");
-    if (!isActive) return alert("please, connect");
+    if (!title || !goal || !duration)
+      return toast.info("Please provide all values");
+    if (!isActive) return toast.info("please, connect");
     try {
       setSendingTx(true);
       const tx = await proposeCampaign(
@@ -34,15 +36,15 @@ const CreateCampaign = () => {
         duration * 60
       );
       const receipt = await tx.wait();
-      if (receipt.status === 0) return alert("tx failed");
+      if (receipt.status === 0) return toast.error("tx failed");
 
-      alert("campaign created!!");
+      toast.success("campaign created!!");
     } catch (error) {
       console.log("error: ", error);
       if (error.info.error.code === 4001) {
-        return alert("You rejected the request");
+        return toast.error("You rejected the request");
       }
-      alert("something went wrong");
+      toast.error("something went wrong");
     } finally {
       setSendingTx(false);
       closeModal();
@@ -52,7 +54,7 @@ const CreateCampaign = () => {
     <Fragment>
       <button
         onClick={openModal}
-        className="w-[fit-content] block rounded-md mx-auto bg-blue-400 px-4 py-4 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+        className="w-[fit-content] block rounded-md mx-auto bg-blue-400 px-4 py-3 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
       >
         Create a Campaign
       </button>

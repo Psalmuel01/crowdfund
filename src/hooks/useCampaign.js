@@ -19,6 +19,7 @@ const useCampaign = (id) => {
                 const contract = await getCrowdfundContract(provider, false);
 
                 const campaignStruct = await contract.crowd(campaignId);
+                const contributorArray = await contract.getContributors(campaignId)
 
                 const campaignDetails = {
                     id: campaignId,
@@ -28,7 +29,7 @@ const useCampaign = (id) => {
                     durationTime: Number(campaignStruct.durationTime),
                     isActive: campaignStruct.isActive,
                     fundingBalance: campaignStruct.fundingBalance,
-                    contributors: campaignStruct.contributors,
+                    contributors: contributorArray,
                 };
 
                 setCampaign(campaignDetails);
@@ -40,6 +41,7 @@ const useCampaign = (id) => {
         };
 
         fetchCampaign();
+        // console.log("campdet", campaign.contributors[0]);
     }, [campaignLength, id, provider]);
     return { campaign, state };
 };

@@ -5,6 +5,7 @@ import { formatEther, parseEther } from "ethers";
 import { formatDate } from "../utils";
 import useContribute from "../hooks/useContribute";
 import { useConnection } from "../context/connection";
+import useAllCampaigns from "../hooks/useAllCampaigns";
 
 const Campaign = () => {
   const [amountInput, setAmountInput] = useState(0);
@@ -101,7 +102,7 @@ const Campaign = () => {
             {sendingTx ? "Contributing..." : "Contribute"}
           </button>
         </div>
-        <div className="max-w-md mb-10 text-xs text-gray-600 sm:text-sm md:text-center">
+        <div className="mb-10 text-xs text-gray-600 sm:text-sm md:text-center">
           <div>
             <div className="px-6 py-4">
               <p className="mt-2 font-bold text-gray-500">
@@ -113,8 +114,16 @@ const Campaign = () => {
               <p className="mt-2 font-bold text-gray-500">
                 Funding Goal - {formatEther(campaign?.fundingGoal)} ETH
               </p>
-              <p className="mt-2 font-bold text-gray-500">
-                Contributors - {campaign.contributors}
+              <p className="mt-5 font-bold text-gray-500"> <span className="text-blue-500 text-lg">Contributors</span>
+                {!campaign?.contributors.length ? (
+                  <p className="mt-4 font-bold text-gray-500">No Contributors</p>
+                ) : (
+                  campaign?.contributors.map((contributor, index) => (
+                    <p className="mt-2 font-bold text-gray-500" key={index}>
+                      {index + 1}. {contributor}
+                    </p>
+                  ))
+                )}
               </p>
             </div>
           </div>

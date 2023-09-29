@@ -5,6 +5,7 @@ import {
   getCrowdfundContract,
   getCrowdfundContractWithProvider,
 } from "../utils";
+import { toast } from "react-toastify";
 
 const useAllCampaigns = () => {
   const [campaigns, setCampaigns] = useState([]);
@@ -44,11 +45,30 @@ const useAllCampaigns = () => {
     };
 
     fetchAllCampaigns();
-    console.log(campaigns);
+    // console.log(campaigns);
+  }, [campaignNo, provider]);
 
-    // Listen for event
+  // Listen for event and update
+
+  useEffect(() => {
+    const updateCampaigns = (id, title, fundingGoal, duration) => {
+      const newCampaign = {
+        id,
+        title,
+        fundingGoal,
+        durationTime: Number(duration),
+        isActive: true,
+        fundingBalance: 0,
+        contributors: [],
+      };
+      const newCampaigns = [...campaigns, newCampaign];
+      setCampaigns(newCampaigns);
+    };
+
     const handleProposeCampaignEvent = (id, title, amount, duration) => {
-      console.log({ id, title, amount, duration });
+      toast.info("new campaign 🔽");
+      console.log(id, title, amount, duration);
+      updateCampaigns(id, title, amount, duration);
     };
     const contract = getCrowdfundContractWithProvider(provider);
     contract.on("ProposeCampaign", handleProposeCampaignEvent);
@@ -56,7 +76,7 @@ const useAllCampaigns = () => {
     return () => {
       contract.off("ProposeCampaign", handleProposeCampaignEvent);
     };
-  }, [campaignNo, provider]);
+  }, [campaigns, provider]);
 
   return campaigns;
 };
