@@ -4,46 +4,46 @@ import { useConnection } from "../context/connection";
 import { getCrowdfundContract } from "../utils";
 
 const useCampaign = (id) => {
-    const [campaign, setCampaign] = useState(null);
-    const [state, setState] = useState("LOADING");
-    const { provider } = useConnection();
-    const campaignLength = useCampaignCount();
+  const [campaign, setCampaign] = useState(null);
+  const [state, setState] = useState("LOADING");
+  const { provider } = useConnection();
+  const campaignLength = useCampaignCount();
 
-    useEffect(() => {
-        const fetchCampaign = async () => {
-            const campaignId = Number(id);
-            if (!campaignLength) return;
-            if (!campaignId || campaignId > campaignLength)
-                return setState("NOT_FOUND");
-            try {
-                const contract = await getCrowdfundContract(provider, false);
+  useEffect(() => {
+    const fetchCampaign = async () => {
+      const campaignId = Number(id);
+      if (!campaignLength) return;
+      if (!campaignId || campaignId > campaignLength)
+        return setState("NOT_FOUND");
+      try {
+        const contract = await getCrowdfundContract(provider, false);
 
-                const campaignStruct = await contract.crowd(campaignId);
-                const contributorArray = await contract.getContributors(campaignId)
+        const campaignStruct = await contract.crowd(campaignId);
+        const contributorArray = await contract.getContributors(campaignId);
 
-                const campaignDetails = {
-                    id: campaignId,
-                    title: campaignStruct.title,
-                    fundingGoal: campaignStruct.fundingGoal,
-                    owner: campaignStruct.owner,
-                    durationTime: Number(campaignStruct.durationTime),
-                    isActive: campaignStruct.isActive,
-                    fundingBalance: campaignStruct.fundingBalance,
-                    contributors: contributorArray,
-                };
-
-                setCampaign(campaignDetails);
-                setState("LOADED");
-            } catch (error) {
-                console.error("Error fetching campaigns:", error);
-                setState("NOT_FOUND");
-            }
+        const campaignDetails = {
+          id: campaignId,
+          title: campaignStruct.title,
+          fundingGoal: campaignStruct.fundingGoal,
+          owner: campaignStruct.owner,
+          durationTime: Number(campaignStruct.durationTime),
+          isActive: campaignStruct.isActive,
+          fundingBalance: campaignStruct.fundingBalance,
+          contributors: contributorArray,
         };
 
-        fetchCampaign();
-        // console.log("campdet", campaign.contributors[0]);
-    }, [campaignLength, id, provider]);
-    return { campaign, state };
+        setCampaign(campaignDetails);
+        setState("LOADED");
+      } catch (error) {
+        console.error("Error fetching campaigns:", error);
+        setState("NOT_FOUND");
+      }
+    };
+
+    fetchCampaign();
+    // console.log("campdet", campaign.contributors[0]);
+  }, [campaignLength, id, provider]);
+  return { campaign, state };
 };
 
 export default useCampaign;

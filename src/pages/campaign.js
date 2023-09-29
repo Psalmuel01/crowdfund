@@ -5,7 +5,7 @@ import { formatEther, parseEther } from "ethers";
 import { formatDate } from "../utils";
 import useContribute from "../hooks/useContribute";
 import { useConnection } from "../context/connection";
-import useAllCampaigns from "../hooks/useAllCampaigns";
+import { toast } from "react-toastify";
 
 const Campaign = () => {
   const [amountInput, setAmountInput] = useState(0);
@@ -20,22 +20,22 @@ const Campaign = () => {
 
   const handleContribute = async () => {
     if (!isActive || !provider) return;
-    if (amountInput <= 0) return alert("Enter a non-zero amount!");
+    if (amountInput <= 0) return toast.info("Enter a non-zero amount!");
 
     try {
       setSendingTx(true);
       const tx = await contribute(id, parseEther(String(amountInput)));
       const receipt = await tx.wait();
 
-      if (receipt.status === 0) return alert("tx failed");
+      if (receipt.status === 0) return toast.error("tx failed");
 
-      alert("Thanks for contibuting!!");
+      toast.success("Thanks for contibuting!!");
     } catch (error) {
       console.log("error: ", error);
       if (error.info.error.code === 4001) {
-        return alert("You rejected the request");
+        return toast.error("You rejected the request");
       }
-      alert("something went wrong");
+      toast.error("something went wrong");
     } finally {
       setSendingTx(false);
     }
@@ -55,7 +55,7 @@ const Campaign = () => {
               {campaign.isActive ? "Active" : "Inactive"}
             </span>
           </div>
-          <h2 className="max-w-lg mb-6 font-sans text-3xl font-bold leading-none tracking-tight text-gray-900 sm:text-4xl md:mx-auto">
+          <h2 className="max-w-lg mb-2 font-sans text-3xl font-bold leading-none tracking-tight text-gray-900 sm:text-4xl md:mx-auto">
             <span className="relative inline-block">
               <svg
                 viewBox="0 0 52 24"
@@ -79,7 +79,6 @@ const Campaign = () => {
                   height="24"
                 />
               </svg>
-              <span className="relative">The</span>
             </span>{" "}
             Campaign '{campaign.title}'
           </h2>
@@ -114,9 +113,13 @@ const Campaign = () => {
               <p className="mt-2 font-bold text-gray-500">
                 Funding Goal - {formatEther(campaign?.fundingGoal)} ETH
               </p>
-              <p className="mt-5 font-bold text-gray-500"> <span className="text-blue-500 text-lg">Contributors</span>
+              <p className="mt-5 font-bold text-gray-500">
+                {" "}
+                <span className="text-blue-500 text-lg">Contributors</span>
                 {!campaign?.contributors.length ? (
-                  <p className="mt-4 font-bold text-gray-500">No Contributors</p>
+                  <p className="mt-4 font-bold text-gray-500">
+                    No Contributors
+                  </p>
                 ) : (
                   campaign?.contributors.map((contributor, index) => (
                     <p className="mt-2 font-bold text-gray-500" key={index}>
