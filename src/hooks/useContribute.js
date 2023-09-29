@@ -4,33 +4,32 @@ import { calculateGasMargin, getCrowdfundContract } from "../utils";
 import useCampaignCount from "./useCampaignCount";
 
 const useContribute = () => {
-    const { provider, isActive } = useConnection();
-    const campaignLength = useCampaignCount();
-    const contribute = useCallback(
-        async (id, amount) => {
-            console.log({ amount });
-            if (!isActive || !provider) return;
-            if (!campaignLength) return;
-            if (Number(id) > campaignLength)
-                return alert("campaign does not exist");
-            const contract = await getCrowdfundContract(provider, true);
+  const { provider, isActive } = useConnection();
+  const campaignLength = useCampaignCount();
+  const contribute = useCallback(
+    async (id, amount) => {
+      console.log({ amount });
+      if (!isActive || !provider) return;
+      if (!campaignLength) return;
+      if (Number(id) > campaignLength) return alert("campaign does not exist");
+      const contract = await getCrowdfundContract(provider, true);
 
-            const estimatedGas = await contract.contributeEth.estimateGas(
-                Number(id),
-                {
-                    value: amount,
-                }
-            );
+      const estimatedGas = await contract.contributeEth.estimateGas(
+        Number(id),
+        {
+          value: amount,
+        }
+      );
 
-            return contract.contributeEth(Number(id), {
-                value: amount,
-                gasLimit: calculateGasMargin(estimatedGas),
-            });
-        },
-        [campaignLength, isActive, provider]
-    );
+      return contract.contributeEth(Number(id), {
+        value: amount,
+        gasLimit: calculateGasMargin(estimatedGas),
+      });
+    },
+    [campaignLength, isActive, provider]
+  );
 
-    return contribute;
+  return contribute;
 };
 
 export default useContribute;
