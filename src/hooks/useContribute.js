@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useConnection } from "../context/connection";
 import { calculateGasMargin, getCrowdfundContract } from "../utils";
 import useCampaignCount from "./useCampaignCount";
+import { toast } from "react-toastify";
 
 const useContribute = () => {
   const { provider, isActive } = useConnection();
@@ -11,7 +12,8 @@ const useContribute = () => {
       console.log({ amount });
       if (!isActive || !provider) return;
       if (!campaignLength) return;
-      if (Number(id) > campaignLength) return alert("campaign does not exist");
+      if (Number(id) > campaignLength)
+        return toast.error("campaign does not exist");
       const contract = await getCrowdfundContract(provider, true);
 
       const estimatedGas = await contract.contributeEth.estimateGas(
